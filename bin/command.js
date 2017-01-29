@@ -1,4 +1,4 @@
-#!/app/bin/env node
+#!/usr/bin/env node
 
 import express from 'express';
 import request from 'request';
