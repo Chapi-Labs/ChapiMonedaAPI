@@ -16,9 +16,9 @@ export const callBI = () => {
       'Content-Type': 'application/x-www-form-urlencoded',
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36',
     },
-    uri: 'https://www.corporacionbi.com/service/mod_moneda.php',
+    uri: 'http://learn-in.newtonlabs.com.gt',
     body: formData,
-    method: 'POST'
+    method: 'GET'
   }, (err, response, body) => {
     console.log(body);
   });
