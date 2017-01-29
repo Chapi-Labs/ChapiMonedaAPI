@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'The value of path {PATH} ({VALUE}) is not a valid email address.']
+    match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'The value of path {PATH} ({VALUE}) is not a valid email address.'] // eslint-disable-line
   },
   createdAt: {
     type: Date,

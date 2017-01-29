@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 
 /**
- * User Schema
+ * Schedule Schema
  */
 const ScheduleSchema = new mongoose.Schema({
   date: {
@@ -50,7 +50,7 @@ ScheduleSchema.statics = {
         return Promise.reject(err);
       });
   },
-
+};
 
 /**
  * @typedef User
