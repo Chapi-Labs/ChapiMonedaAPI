@@ -71,9 +71,7 @@
     "morgan": "1.7.0",
     "querystring": "^0.2.0",
     "request": "^2.79.0",
-    "winston": "2.3.0"
-  },
-  "devDependencies": {
+    "winston": "2.3.0",
     "chai": "^3.4.1",
     "commitizen": "^2.9.2",
     "coveralls": "^2.11.6",
@@ -91,6 +89,9 @@
     "supertest": "2.0.1",
     "supertest-as-promised": "4.0.2",
     "validate-commit-msg": "^2.6.1"
+  },
+  "devDependencies": {
+
   },
   "license": "MIT",
   "config": {
