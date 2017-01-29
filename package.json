@@ -13,6 +13,7 @@
   "scripts": {
     "start": "gulp serve",
     "build": "gulp",
+    "postinstall": "gulp",
     "lint": "esw *.js server config --color",
     "lint:watch": "yarn lint -- --watch",
     "test": "cross-env NODE_ENV=test babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha -- --ui bdd --reporter spec --colors --compilers js:babel-core/register ./server/**/*.test.js",
