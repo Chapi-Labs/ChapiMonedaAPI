@@ -1,4 +1,9 @@
 #! /app/bin/node
+
+import express from 'express';
+import request from 'request';
+import querystring from 'querystring';
+
 export const callBI = () => {
   const form = {
     action: 'getMoneda'
