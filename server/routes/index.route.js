@@ -1,8 +1,10 @@
 import express from 'express';
 import request from 'request';
+import curl from 'curlrequest';
 import querystring from 'querystring';
 import userRoutes from './user.route';
 import authRoutes from './auth.route';
+
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -11,21 +13,29 @@ router.get('/health-check', (req, res) =>
   res.send('OK')
 );
 
-router.get('/moneda/promerica', (req, res) => {
-  request({
+const promerica = (res, bi) => {
+  const options = {
+    url: 'https://www.bancopromerica.com.gt/wsservicebus/wsonlineservicebus.asmx/getTipoCambio',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Content-Length': 0
     },
-    url: 'https://www.bancopromerica.com.gt/wsservicebus/wsonlineservicebus.asmx/getTipoCambio',
-    method: 'POST'
-  }, (err, response, body) => {
-    res.send(err);
-    res.send(response);
-    res.send(body);
-  });
-});
+  };
+  const callback = (err, data) => {
+    const tempR = JSON.parse(data).d;
+    const resultTransform = {
+      compraInternet: tempR.compraInternet,
+      ventaInternet: tempR.ventaInternet,
+      compraAgencia: tempR.compraAgencia,
+      ventaAgencia: tempR.ventaAgencia
+    };
+    res.send({ promerica: resultTransform, bi });
+  };
+  curl.request(options, callback);
+};
 
-router.get('/moneda/bi', (req, res) => {
+const bi = (req, res) => {
   const form = {
     action: 'getMoneda'
   };
@@ -43,10 +53,21 @@ router.get('/moneda/bi', (req, res) => {
   }, (err, response, body) => {
     const result = JSON.parse(body);
     if (result.Result === 'OK') {
-      res.send(result.result);
+      const resultTransform = {
+        compraInternet: result.result[2],
+        ventaInternet: result.result[3],
+        compraAgencia: result.result[0],
+        ventaAgencia: result.result[1]
+      };
+      promerica(res, resultTransform);
     }
   });
+};
+
+router.get('/moneda', (req, res) => {
+  bi(req, res);
 });
+
 // mount user routes at /users
 router.use('/users', userRoutes);
 
