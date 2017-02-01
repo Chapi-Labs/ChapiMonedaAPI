@@ -11,6 +11,20 @@ router.get('/health-check', (req, res) =>
   res.send('OK')
 );
 
+router.get('/moneda/promerica', (req, res) => {
+  request({
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    url: 'https://www.bancopromerica.com.gt/wsservicebus/wsonlineservicebus.asmx/getTipoCambio',
+    method: 'POST'
+  }, (err, response, body) => {
+    res.send(err);
+    res.send(response);
+    res.send(body);
+  });
+});
+
 router.get('/moneda/bi', (req, res) => {
   const form = {
     action: 'getMoneda'
@@ -27,7 +41,10 @@ router.get('/moneda/bi', (req, res) => {
     body: formData,
     method: 'POST'
   }, (err, response, body) => {
-    res.send(body);
+    const result = JSON.parse(body);
+    if (result.Result === 'OK') {
+      res.send(result.result);
+    }
   });
 });
 // mount user routes at /users
