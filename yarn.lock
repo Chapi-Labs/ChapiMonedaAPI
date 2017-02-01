@@ -1220,6 +1220,10 @@ css@2.X:
     source-map-resolve "^0.3.0"
     urix "^0.1.0"
 
+curlrequest@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/curlrequest/-/curlrequest-1.0.1.tgz#cd3d8e04e81d7996b0a1cd9716cb09d50b41d50f"
+
 currently-unhandled@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
