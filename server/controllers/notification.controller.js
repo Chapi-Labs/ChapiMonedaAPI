@@ -34,19 +34,18 @@ function create(req, res, next) {
     .then((notification) => {
       if (notification !== null && notification !== undefined) {
         update(req, res, next, notification);
-      } else {
-        const notif = new Notification({
-          amount: req.body.amount,
-          bank: req.body.bank,
-          type: req.body.type,
-          email: req.body.email
-        });
-
-        notif.save()
-          .then(savedNotification => res.json(savedNotification))
-          .catch(e => next(e));
       }
     });
+  const notif = new Notification({
+    amount: req.body.amount,
+    bank: req.body.bank,
+    type: req.body.type,
+    email: req.body.email
+  });
+
+  notif.save()
+    .then(savedNotification => res.json(savedNotification))
+    .catch(e => next(e));
 }
 
 function searchNotificationByUser(req, res, next) {
