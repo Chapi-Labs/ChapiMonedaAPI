@@ -34,6 +34,7 @@ function create(req, res, next) {
     .then((notification) => {
       if (notification !== null && notification !== undefined) {
         update(req, res, next, notification);
+        res.json('updated');
       }
     });
   const notif = new Notification({
