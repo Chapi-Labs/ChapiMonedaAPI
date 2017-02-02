@@ -4,7 +4,9 @@ import curl from 'curlrequest';
 import querystring from 'querystring';
 import userRoutes from './user.route';
 import authRoutes from './auth.route';
-
+import notifRoutes from './notification.route';
+import Notification from '../models/notification.model';
+import sendMail from '../helpers/mailer';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -24,13 +26,38 @@ const promerica = (res, bi) => {
   };
   const callback = (err, data) => {
     const tempR = JSON.parse(data).d;
-    const resultTransform = {
-      compraInternet: tempR.compraInternet,
-      ventaInternet: tempR.ventaInternet,
-      compraAgencia: tempR.compraAgencia,
-      ventaAgencia: tempR.ventaAgencia
-    };
-    res.send({ promerica: resultTransform, bi });
+    const resultTransform = [
+      { type: 'compraInternet', value: parseFloat(tempR.compraInternet) },
+      { type: 'ventaInternet', value: parseFloat(tempR.ventaInternet) },
+      { type: 'compraAgencia', value: parseFloat(tempR.compraAgencia) },
+      { type: 'ventaAgencia', value: parseFloat(tempR.ventaAgencia) }
+    ];
+
+    const apiMoneda = [
+      {
+        bank: resultTransform,
+        name: 'promerica'
+      },
+      {
+        bank: bi, name: 'bi'
+      }
+    ];
+    for (const bank of apiMoneda) {
+      const values = bank.bank;
+      const name = bank.name;
+      for (const currency of values) {
+        Notification
+          .getByAmountAndTypeAndBank(name, currency.value, currency.type)
+          .then((notifications) => {
+            if (notifications.length !== 0) {
+              for (const notification of notifications) {
+                sendMail(notification.email, notification.amount);
+              }
+            }
+          });
+      }
+    }
+    res.json('ok');
   };
   curl.request(options, callback);
 };
@@ -53,12 +80,12 @@ const bi = (req, res) => {
   }, (err, response, body) => {
     const result = JSON.parse(body);
     if (result.Result === 'OK') {
-      const resultTransform = {
-        compraInternet: result.result[2],
-        ventaInternet: result.result[3],
-        compraAgencia: result.result[0],
-        ventaAgencia: result.result[1]
-      };
+      const resultTransform = [
+        { type: 'compraInternet', value: parseFloat(result.result[2]) },
+        { type: 'ventaInternet', value: parseFloat(result.result[3]) },
+        { type: 'compraAgencia', value: parseFloat(result.result[0]) },
+        { type: 'ventaAgencia', value: parseFloat(result.result[1]) }
+      ];
       promerica(res, resultTransform);
     }
   });
@@ -70,6 +97,9 @@ router.get('/moneda', (req, res) => {
 
 // mount user routes at /users
 router.use('/users', userRoutes);
+
+//  mount notification routes at /notification
+router.use('/notification', notifRoutes);
 
 // mount auth routes at /auth
 router.use('/auth', authRoutes);
