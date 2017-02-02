@@ -26,5 +26,19 @@ export default {
       username: Joi.string().required(),
       password: Joi.string().required()
     }
+  },
+  // POST /api/notification
+  createNotification: {
+    body: {
+      amount: Joi.number().min(0).required(),
+      bank: Joi.string().required(),
+      email: Joi.string().required(),
+      type: Joi.string().required()
+    }
+  },
+  searchNotification: {
+    body: {
+      user: Joi.string().required(),
+    }
   }
 };
