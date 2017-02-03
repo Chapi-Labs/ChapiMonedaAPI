@@ -16,7 +16,7 @@ const sendMail = (emailer, content) => {
     from: 'notifications@newtonlabs.com.gt',
     to: emailer, // An array if you have multiple recipients.
     subject: 'Cambió el tipo de cambio !',
-    text: content
+    text: `¡El tipo de cambio ha llegado al monto deseado: ${content}!`
   });
 };
 
