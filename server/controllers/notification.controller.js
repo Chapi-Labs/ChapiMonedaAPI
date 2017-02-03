@@ -45,7 +45,7 @@ function create(req, res, next) {
   });
 
   notif.save()
-    .then(savedNotification => res.json(savedNotification))
+    .then(res.json('saved'))
     .catch(e => next(e));
 }
 
