@@ -38,7 +38,7 @@ function create(req, res, next) {
       }
     });
   const notif = new Notification({
-    amount: req.body.amount,
+    amount: parseFloat(req.body.amount),
     bank: req.body.bank,
     type: req.body.type,
     email: req.body.email
@@ -65,7 +65,7 @@ function searchNotificationByUser(req, res, next) {
  */
 function update(req, res, next, notif) {
   const notification = notif;
-  notification.amount = req.body.amount;
+  notification.amount = parseFloat(req.body.amount);
   notification.bank = req.body.bank;
   notification.email = req.body.email;
   notification.type = req.body.type;
