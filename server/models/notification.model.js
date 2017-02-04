@@ -71,8 +71,7 @@ NotificationSchema.statics = {
         if (notification) {
           return notification;
         }
-        const err = new APIError('No such notification with email', httpStatus.NOT_FOUND);
-        return Promise.reject(err);
+        return undefined;
       });
   },
   getByAmountAndTypeAndBank(bank, amount, type) {

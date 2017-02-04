@@ -1,4 +1,5 @@
 import Notification from '../models/notification.model';
+import { sendConfirmationEmail } from '../helpers/mailer';
 
 /**
  * Load user and append to req.
@@ -34,19 +35,19 @@ function create(req, res, next) {
     .then((notification) => {
       if (notification !== null && notification !== undefined) {
         update(req, res, next, notification);
-        res.json('updated');
+      } else {
+        const notif = new Notification({
+          amount: parseFloat(req.body.amount),
+          bank: req.body.bank,
+          type: req.body.type,
+          email: req.body.email
+        });
+        notif.save()
+          .then(res.json('saved'))
+          .then(notific => sendConfirmationEmail(notific))
+          .catch(e => next(e));
       }
     });
-  const notif = new Notification({
-    amount: parseFloat(req.body.amount),
-    bank: req.body.bank,
-    type: req.body.type,
-    email: req.body.email
-  });
-
-  notif.save()
-    .then(res.json('saved'))
-    .catch(e => next(e));
 }
 
 function searchNotificationByUser(req, res, next) {
@@ -71,7 +72,7 @@ function update(req, res, next, notif) {
   notification.type = req.body.type;
 
   notification.save()
-    .then(notifSaved => res.json(notifSaved))
+    .then(res.json('updated'))
     .catch(e => next(e));
 }
 

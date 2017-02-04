@@ -6,7 +6,7 @@ import userRoutes from './user.route';
 import authRoutes from './auth.route';
 import notifRoutes from './notification.route';
 import Notification from '../models/notification.model';
-import sendMail from '../helpers/mailer';
+import { sendMail } from '../helpers/mailer';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
