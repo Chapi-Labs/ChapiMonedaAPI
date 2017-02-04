@@ -51,7 +51,7 @@ const promerica = (res, bi) => {
           .then((notifications) => {
             if (notifications.length !== 0) {
               for (const notification of notifications) {
-                sendMail(notification.email, notification.amount);
+                sendMail(notification);
               }
             }
           });

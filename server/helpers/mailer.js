@@ -11,12 +11,14 @@ const auth = {
 
 const nodemailerMailgun = nodemailer.createTransport(mg(auth));
 
-const sendMail = (emailer, content) => {
+const sendMail = (notification) => {
   nodemailerMailgun.sendMail({
     from: 'notifications@newtonlabs.com.gt',
-    to: emailer, // An array if you have multiple recipients.
+    to: notification.email, // An array if you have multiple recipients.
     subject: 'Cambió el tipo de cambio !',
-    text: `¡El tipo de cambio ha llegado al monto deseado: ${content}!`
+    text: `¡El tipo de cambio ${notification.type}
+      de ${notification.bank} ha llegado al monto deseado:
+      ${notification.content}!`
   });
 };
 
