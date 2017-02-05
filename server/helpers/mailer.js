@@ -30,7 +30,7 @@ export const sendMail = (notification) => {
     subject: 'Cambió el tipo de cambio !',
     text: `¡El tipo de cambio ${notification.type}
       de ${parseBank(notification.bank)} ha llegado al monto deseado:
-      ${notification.content}! \n
+      ${notification.amount}! \n
       Atentamente, \n
       Newton Labs `
   });
