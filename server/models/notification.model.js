@@ -85,8 +85,8 @@ NotificationSchema.statics = {
       if (notification) {
         return notification;
       }
-      const err = new APIError('No such notification with user id', httpStatus.NOT_FOUND);
-      return Promise.reject(err);
+      // const err = new APIError('No such notification with user id', httpStatus.NOT_FOUND);
+      return [];
     });
   },
   /**
