@@ -76,7 +76,7 @@ NotificationSchema.statics = {
   },
   getByAmountAndTypeAndBank(bank, amount, type) {
     return this.find({
-      amount: { $gte: amount },
+      amount: { $lte: amount },
       type,
       bank
     })
