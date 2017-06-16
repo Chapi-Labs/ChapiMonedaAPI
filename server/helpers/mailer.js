@@ -25,12 +25,11 @@ const parseBank = (bank) => {
 
 export const sendMail = (notification) => {
   nodemailerMailgun.sendMail({
-    from: 'notifications@newtonlabs.com.gt',
+    from: 'Newton Labs <notifications@newtonlabs.com.gt>',
     to: notification.email, // An array if you have multiple recipients.
     subject: 'Cambió el tipo de cambio !',
     text: `¡El tipo de cambio ${notification.type}
-      de ${parseBank(notification.bank)} ha llegado al monto deseado:
-      ${notification.amount}! \n
+      de ${parseBank(notification.bank)} ha llegado o superado el monto deseado: ${notification.amount}! \n
       Atentamente, \n
       Newton Labs `
   });
@@ -38,7 +37,7 @@ export const sendMail = (notification) => {
 
 export const sendConfirmationEmail = (notification) => {
   nodemailerMailgun.sendMail({
-    from: 'notifications@newtonlabs.com.gt',
+    from: 'Newton Labs <notifications@newtonlabs.com.gt>',
     to: notification.email, // An array if you have multiple recipients.
     subject: 'Confirmación de cuenta',
     text: `Estimado usuario, \n
