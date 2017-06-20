@@ -1,11 +1,13 @@
 import express from 'express';
 import request from 'request';
 import curl from 'curlrequest';
+import { parseString } from 'xml2js';
 import querystring from 'querystring';
 import userRoutes from './user.route';
 import authRoutes from './auth.route';
 import notifRoutes from './notification.route';
 import Notification from '../models/notification.model';
+import ExchangeRate from '../models/exchange_rate.model';
 import { sendMail } from '../helpers/mailer';
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -15,7 +17,7 @@ router.get('/health-check', (req, res) =>
   res.send('OK')
 );
 
-const promerica = (res, bi) => {
+const promerica = (req, res, bi, central) => {
   const options = {
     url: 'https://www.bancopromerica.com.gt/wsservicebus/wsonlineservicebus.asmx/getTipoCambio',
     method: 'POST',
@@ -24,13 +26,14 @@ const promerica = (res, bi) => {
       'Content-Length': 0
     },
   };
+
   const callback = (err, data) => {
     const tempR = JSON.parse(data).d;
     const resultTransform = [
-      { type: 'compraInternet', value: parseFloat(tempR.compraInternet) },
-      { type: 'ventaInternet', value: parseFloat(tempR.ventaInternet) },
-      { type: 'compraAgencia', value: parseFloat(tempR.compraAgencia) },
-      { type: 'ventaAgencia', value: parseFloat(tempR.ventaAgencia) }
+      { rateType: 'compraInternet', value: parseFloat(tempR.compraInternet) },
+      { rateType: 'ventaInternet', value: parseFloat(tempR.ventaInternet) },
+      { rateType: 'compraAgencia', value: parseFloat(tempR.compraAgencia) },
+      { rateType: 'ventaAgencia', value: parseFloat(tempR.ventaAgencia) }
     ];
 
     const apiMoneda = [
@@ -40,14 +43,24 @@ const promerica = (res, bi) => {
       },
       {
         bank: bi, name: 'bi'
+      },
+      {
+        name: 'Banco Central',
+        bank: [{ rateType: 'Banca Central', value: parseFloat(central) }]
       }
     ];
+
     for (const bank of apiMoneda) {
       const values = bank.bank;
       const name = bank.name;
+      new ExchangeRate({
+        bank: name,
+        rates: values
+      }).save();
+
       for (const currency of values) {
         Notification
-          .getByAmountAndTypeAndBank(name, currency.value, currency.type)
+          .getByAmountAndTypeAndBank(name, currency.value, currency.rateType)
           .then((notifications) => {
             if (notifications.length !== 0) {
               for (const notification of notifications) {
@@ -62,7 +75,7 @@ const promerica = (res, bi) => {
   curl.request(options, callback);
 };
 
-const bi = (req, res) => {
+const bi = (req, res, central) => {
   const form = {
     action: 'getMoneda'
   };
@@ -81,18 +94,41 @@ const bi = (req, res) => {
     const result = JSON.parse(body);
     if (result.Result === 'OK') {
       const resultTransform = [
-        { type: 'compraInternet', value: parseFloat(result.result[2]) },
-        { type: 'ventaInternet', value: parseFloat(result.result[3]) },
-        { type: 'compraAgencia', value: parseFloat(result.result[0]) },
-        { type: 'ventaAgencia', value: parseFloat(result.result[1]) }
+        { rateType: 'compraInternet', value: parseFloat(result.result[2]) },
+        { rateType: 'ventaInternet', value: parseFloat(result.result[3]) },
+        { rateType: 'compraAgencia', value: parseFloat(result.result[0]) },
+        { rateType: 'ventaAgencia', value: parseFloat(result.result[1]) }
       ];
-      promerica(res, resultTransform);
+      promerica(req, res, resultTransform, central);
     }
+  });
+};
+const centralBank = (req, res) => {
+  const options = { method: 'POST',
+    url: 'http://www.banguat.gob.gt/variables/ws/TipoCambio.asmx',
+    headers: { 'content-type': 'application/soap+xml; charset=utf-8' },
+    body: '<?xml version="1.0" encoding="utf-8"?>\n<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">\n  <soap12:Body>\n    <TipoCambioDia xmlns="http://www.banguat.gob.gt/variables/ws/" />\n  </soap12:Body>\n</soap12:Envelope>' };
+
+  request(options, (error, response, body) => {
+    if (error) throw new Error(error);
+    parseString(body, { ignoreAttrs: true }, (err, result) => {
+      if (err) throw new Error(err);
+      const central =                  // eslint-disable-line
+        result['soap:Envelope']      // eslint-disable-line
+        ['soap:Body'][0]             // eslint-disable-line
+        ['TipoCambioDiaResponse'][0] // eslint-disable-line
+        ['TipoCambioDiaResult'][0]   // eslint-disable-line
+        ['CambioDolar'][0]           // eslint-disable-line
+        ['VarDolar'][0]              // eslint-disable-line
+        ['referencia'][0];           // eslint-disable-line
+
+      bi(req, res, central);
+    });
   });
 };
 
 router.get('/moneda', (req, res) => {
-  bi(req, res);
+  centralBank(req, res);
 });
 
 // mount user routes at /users
