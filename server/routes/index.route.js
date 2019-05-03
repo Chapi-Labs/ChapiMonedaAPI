@@ -19,7 +19,7 @@ router.get('/health-check', (req, res) =>
 
 const promerica = (req, res, bi, central) => {
   const options = {
-    url: 'https://www.bancopromerica.com.gt/wsservicebus/wsonlineservicebus.asmx/getTipoCambio',
+    url: 'https://wstasacambio.bancopromerica.com.gt/wsonlineservicebus.asmx/getTipoCambio',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
